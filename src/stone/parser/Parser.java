@@ -14,6 +14,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+/**
+ * サンプルのパーサ・コンビネータ
+ */
 public class Parser {
     protected static abstract class Element {
         protected abstract void parse(Lexer lexer, List<ASTree> res)

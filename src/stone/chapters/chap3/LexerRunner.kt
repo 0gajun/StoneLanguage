@@ -13,7 +13,7 @@ object LexerRunner {
         var t: Token = l.read()
 
         while (t != Token.EOF) {
-            System.out.println("=> " + t.getText() + ": " + t.getLineNumber())
+            println("=> " + t.getText() + ": " + t.getLineNumber())
             t = l.read()
         }
     }
