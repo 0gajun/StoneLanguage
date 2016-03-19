@@ -12,6 +12,8 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 /**
+ * 字句解析器
+ *
  * Created by Junya on 2016/03/17.
  */
 class Lexer(r: Reader) {
@@ -23,19 +25,9 @@ class Lexer(r: Reader) {
     private var mReader: LineNumberReader = LineNumberReader(r)
     private var mQueue: MutableList<Token> = arrayListOf()
 
-    fun read() : Token {
-        if (!fillQueue(0)) {
-            return Token.EOF
-        }
-        return mQueue.removeAt(0)
-    }
+    fun read() : Token = if (!fillQueue(0)) Token.EOF else mQueue.removeAt(0)
 
-    fun peek(i: Int) : Token {
-        if (!fillQueue(i)) {
-            return Token.EOF
-        }
-        return mQueue[i]
-    }
+    fun peek(i: Int) : Token = if (!fillQueue(i)) Token.EOF else mQueue[i]
 
     /**
      * @param i iの数だけQueueをTokenで満たす
