@@ -10,7 +10,7 @@ class ParseException : Exception {
 
     constructor(errMsg: String) : super(errMsg)
     constructor(token: Token) : this(exceptionMessage(token, ""))
-    constructor(token: Token, msg: String) : this(exceptionMessage(token, msg))
+    constructor(msg: String, token: Token) : this(exceptionMessage(token, msg))
     constructor(e: IOException) : super(e)
 
     private companion object {
