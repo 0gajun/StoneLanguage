@@ -16,6 +16,7 @@ import java.util.regex.Pattern
  */
 class Lexer(r: Reader) {
     private val REGEX_PATTERN = "\\s*((//.*)|([0-9]+)|(\"(\\\\\"|\\\\\\\\|\\\\n|[^\"])*\")" + "|[A-Z_a-z][A-Z_a-z0-9]*|==|<=|>=|&&|\\|\\||\\p{Punct})?"
+    private val mRegex = Regex(REGEX_PATTERN)
     private val mPattern = Pattern.compile(REGEX_PATTERN)
 
     private var mHasMore: Boolean = true
@@ -81,6 +82,46 @@ class Lexer(r: Reader) {
         mQueue.add(IdToken(lineNo, Token.EOL))
     }
 
+    /**
+     * KotlinのRegexを使ったver.
+     * Java正規表現エンジンで使えるuseTransparentBoundsが使えない為, 一旦使うの保留
+     *
+     * Issue上げてみたさ
+     */
+    protected fun _readLine() {
+        var line: String? = null
+
+        try {
+            line = mReader.readLine()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+        if (line == null) {
+            mHasMore = false
+            return
+        }
+
+        val lineNo = mReader.lineNumber
+        val matcher = mPattern.matcher(line)
+        matcher.useTransparentBounds(true).useAnchoringBounds(false)
+
+        var pos = 0
+        val endPos = line.length
+
+        while (pos < endPos) {
+            val matchResult = mRegex.find(line, pos)
+            if (matchResult != null) {
+                _addToken(lineNo, matchResult)
+                pos = matchResult.range.last + 1 // +1 because we cannot use useTransparentBounds
+            } else {
+                throw ParseException("bad token at line " + lineNo)
+            }
+        }
+
+        mQueue.add(IdToken(lineNo, Token.EOL))
+    }
+
     private fun addToken(lineNo: Int, matcher: Matcher) {
         val m = matcher.group(1)
 
@@ -95,6 +136,24 @@ class Lexer(r: Reader) {
             StrToken(lineNo, toStringLiteral(m))
         } else {
             IdToken(lineNo, m)
+        }
+        mQueue.add(token)
+    }
+    private fun _addToken(lineNo: Int, match: MatchResult) {
+        val values = match.groupValues
+        val v = values[1]
+        if (v.isNullOrBlank() || !values[2].isNullOrBlank()) {
+            print("null")
+            // if only spaces or only comments
+            return
+        }
+
+        val token = if (!values[3].isNullOrBlank()) {
+            NumToken(lineNo, v.toInt())
+        } else if (!values[4].isNullOrBlank()) {
+            StrToken(lineNo, toStringLiteral(v))
+        } else {
+            IdToken(lineNo, v)
         }
         mQueue.add(token)
     }
