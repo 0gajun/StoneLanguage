@@ -1,6 +1,5 @@
 package stone.ui
 
-import com.sun.istack.internal.NotNull
 import java.io.*
 import javax.swing.JFileChooser
 import javax.swing.JOptionPane

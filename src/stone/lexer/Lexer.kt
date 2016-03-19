@@ -1,6 +1,9 @@
 package stone.lexer
 
 import stone.exception.ParseException
+import stone.token.IdToken
+import stone.token.NumToken
+import stone.token.StrToken
 import stone.token.Token
 import java.io.IOException
 import java.io.LineNumberReader
@@ -93,7 +96,6 @@ class Lexer(r: Reader) {
         } else {
             IdToken(lineNo, m)
         }
-
         mQueue.add(token)
     }
 
@@ -117,43 +119,5 @@ class Lexer(r: Reader) {
         return res
     }
 
-    protected class NumToken(lineNumber: Int, value: Int) : Token(lineNumber) {
-        private val mValue = value
 
-        override fun isNumber(): Boolean {
-            return true
-        }
-
-        override fun getText(): String {
-            return mValue.toString()
-        }
-
-        override fun getNumber(): Int {
-            return mValue
-        }
-    }
-
-    protected class IdToken(lineNumber: Int, id: String) : Token(lineNumber) {
-        private val mId = id
-
-        override fun isIdentifier(): Boolean {
-            return true
-        }
-
-        override fun getText(): String {
-            return mId
-        }
-    }
-
-    protected class StrToken(lineNumber: Int, str: String) : Token(lineNumber) {
-        private val mLiteral = str
-
-        override fun isString(): Boolean {
-            return true
-        }
-
-        override fun getText(): String {
-            return mLiteral
-        }
-    }
 }

@@ -14,31 +14,17 @@ abstract class Token(lineNumber: Int) {
         val EOL = "\\n"
     }
 
-
     private val mLineNumber: Int = lineNumber
 
-    fun getLineNumber(): Int {
-        return mLineNumber
-    }
+    fun getLineNumber(): Int = mLineNumber
 
-    open fun isIdentifier(): Boolean {
-        return false
-    }
+    open fun isIdentifier(): Boolean = false
 
-    open fun isNumber(): Boolean {
-        return false
-    }
+    open fun isNumber(): Boolean = false
 
-    open fun isString(): Boolean {
-        return false
-    }
+    open fun isString(): Boolean = false
 
-    open fun getNumber(): Int {
-        throw StoneException("not number token")
-    }
+    open fun getNumber(): Int = throw StoneException("not number token")
 
-    open fun getText(): String {
-        return ""
-    }
-
+    open fun getText(): String = ""
 }
