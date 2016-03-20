@@ -5,6 +5,7 @@ package stone.ast
  */
 class PrimaryExpr(c: List<ASTree>) : ASTList(c) {
     companion object {
+        @JvmStatic
         fun create(c: List<ASTree>) : ASTree = if (c.size == 1) c.single() else PrimaryExpr(c)
     }
 }

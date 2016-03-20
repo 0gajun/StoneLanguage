@@ -1,5 +1,8 @@
 package stone.ast
 
+import stone.env.Environment
+import stone.exception.StoneException
+
 /**
  * root class of Node
  *
@@ -14,6 +17,10 @@ open class ASTList(children: List<ASTree>) : ASTree {
     override fun numChildren(): Int = children.size
 
     override fun children(): Iterator<ASTree> = children.iterator()
+
+    override fun eval(env: Environment): Any {
+        throw StoneException("cannot eval: " + toString(), this)
+    }
 
     override fun location(): String?
             = children.find { !it.location().isNullOrEmpty() }?.location()

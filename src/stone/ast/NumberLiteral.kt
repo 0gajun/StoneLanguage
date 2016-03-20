@@ -1,5 +1,6 @@
 package stone.ast
 
+import stone.env.Environment
 import stone.token.Token
 
 /**
@@ -9,4 +10,6 @@ import stone.token.Token
  */
 class NumberLiteral(token: Token) : ASTLeaf(token) {
     fun value(): Int = token.getNumber()
+
+    override fun eval(env: Environment): Any = value()
 }

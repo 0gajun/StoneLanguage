@@ -1,5 +1,8 @@
 package stone.ast
 
+import stone.StoneConst
+import stone.env.Environment
+
 /**
  * if block
  *
@@ -12,4 +15,15 @@ class IfStmnt(c: List<ASTree>) : ASTList(c){
 
     override fun toString(): String
             = "(if " + condition() + " " + thenBlock() + " else " + elseBlock() + ")"
+
+    override fun eval(env: Environment): Any {
+        val c = condition().eval(env)
+
+        return if (c == StoneConst.TRUE) {
+            condition().eval(env)
+        } else {
+            val block = elseBlock()
+            if (block != null) block.eval(env) else 0
+        }
+    }
 }

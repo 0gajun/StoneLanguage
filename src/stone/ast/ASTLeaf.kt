@@ -1,5 +1,7 @@
 package stone.ast
 
+import stone.env.Environment
+import stone.exception.StoneException
 import stone.token.Token
 
 /**
@@ -17,6 +19,10 @@ open class ASTLeaf(token: Token) : ASTree {
     override fun child(i: Int): ASTree = throw IndexOutOfBoundsException()
 
     override fun numChildren(): Int = 0
+
+    override fun eval(env: Environment): Any {
+        throw StoneException("cannot eval: " + toString(), this)
+    }
 
     override fun children(): Iterator<ASTree> = emptyChildren.iterator()
 

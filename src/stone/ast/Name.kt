@@ -1,5 +1,7 @@
 package stone.ast
 
+import stone.env.Environment
+import stone.exception.StoneException
 import stone.token.Token
 
 /**
@@ -9,4 +11,13 @@ import stone.token.Token
  */
 class Name(t: Token) : ASTLeaf(t) {
     fun name(): String = token.getText()
+
+    override fun eval(env: Environment): Any {
+        val v = env.get(name())
+        if (v != null) {
+            return v
+        } else {
+            throw StoneException("undefined name: " + name(), this)
+        }
+    }
 }
