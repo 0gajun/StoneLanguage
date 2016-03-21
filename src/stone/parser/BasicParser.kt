@@ -12,42 +12,42 @@ import java.util.*
  *
  * Created by Junya on 2016/03/19.
  */
-class BasicParser {
-    private val reserved: HashSet<String> = hashSetOf(";", "}", Token.EOL)
+open class BasicParser {
+    protected val reserved: HashSet<String> = hashSetOf(";", "}", Token.EOL)
     private val operators: Operators = Operators()
 
     init {
         initOperators()
     }
 
-    private val expr0: Parser = rule()
+    protected val expr0: Parser = rule()
 
-    private val primary: Parser = rule(PrimaryExpr::class.java)
+    protected val primary: Parser = rule(PrimaryExpr::class.java)
             .or(rule().sep("(").ast(expr0).sep(")"),
                     rule().number(NumberLiteral::class.java),
                     rule().identifier(Name::class.java, reserved),
                     rule().string(StringLiteral::class.java))
 
-    private val factor: Parser = rule()
+    protected val factor: Parser = rule()
             .or(rule(NegativeExpr::class.java).sep("-").ast(primary), primary)
 
-    private val expr: Parser = expr0.expression(BinaryExpr::class.java, factor, operators)
+    protected val expr: Parser = expr0.expression(BinaryExpr::class.java, factor, operators)
 
-    private val statement0: Parser = rule()
+    protected val statement0: Parser = rule()
 
-    private val block: Parser = rule(BlockStmnt::class.java).sep("{").option(statement0)
+    protected val block: Parser = rule(BlockStmnt::class.java).sep("{").option(statement0)
             .repeat(rule().sep(";", Token.EOL).option(statement0))
             .sep("}")
 
-    private val simple: Parser = rule(PrimaryExpr::class.java).ast(expr)
+    protected val simple: Parser = rule(PrimaryExpr::class.java).ast(expr)
 
-    private val statement: Parser = statement0
+    protected val statement: Parser = statement0
             .or(rule(IfStmnt::class.java).sep("if").ast(expr).ast(block)
                     .option(rule().sep("else").ast(block)),
                     rule(WhileStmnt::class.java).sep("while").ast(expr).ast(block),
                     simple)
 
-    private val program: Parser = rule().or(statement, rule(NullStmnt::class.java)).sep(";", Token.EOL)
+    protected val program: Parser = rule().or(statement, rule(NullStmnt::class.java)).sep(";", Token.EOL)
 
     fun parse(lexer: Lexer) : ASTree = program.parse(lexer)
 
