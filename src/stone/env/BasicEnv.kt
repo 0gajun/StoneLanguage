@@ -15,4 +15,8 @@ class BasicEnv : Environment {
     }
 
     override fun get(name: String): Any? = values.get(name)
+
+    override fun where(name: String): Environment? {
+        throw UnsupportedOperationException()
+    }
 }

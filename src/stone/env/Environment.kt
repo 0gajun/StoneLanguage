@@ -8,4 +8,5 @@ package stone.env
 interface Environment {
     fun put(name: String, value: Any) : Unit
     fun get(name: String) : Any?
+    fun where(name: String) : Environment?
 }
