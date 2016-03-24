@@ -8,7 +8,7 @@ import java.util.*
  * Created by Junya on 2016/03/20.
  */
 class BasicEnv : Environment {
-    val values : HashMap<String, Any> = hashMapOf()
+    val values: HashMap<String, Any> = hashMapOf()
 
     override fun put(name: String, value: Any) {
         values.put(name, value)
@@ -19,4 +19,13 @@ class BasicEnv : Environment {
     override fun where(name: String): Environment? {
         throw UnsupportedOperationException()
     }
+
+    override fun putNew(name: String, value: Any) {
+        throw UnsupportedOperationException()
+    }
+
+    override fun setOuter(e: Environment) {
+        throw UnsupportedOperationException()
+    }
+
 }
