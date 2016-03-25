@@ -28,6 +28,6 @@ class FuncParser : BasicParser() {
         reserved.add(")") // for defining function
         primary.repeat(postfix)
         simple.option(args)
-        program.insertChoice(postfix)
+        program.insertChoice(def)
     }
 }

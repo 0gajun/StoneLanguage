@@ -9,10 +9,10 @@ import stone.exception.StoneException
  *
  * Created by Junya on 2016/03/21.
  */
-class Arguments(t: List<ASTree>) : ASTList(t) {
+class Arguments(t: List<ASTree>) : Postfix(t) {
     fun size() = numChildren()
 
-    fun eval(callerEnv: Environment, value: Any): Any {
+    override fun eval(env: Environment, value: Any): Any {
         if (value !is Function) {
             throw StoneException("bad function", this)
         }
@@ -25,7 +25,7 @@ class Arguments(t: List<ASTree>) : ASTList(t) {
 
         val newEnv = func.makeEnv()
         this.forEachIndexed { i, e ->
-            parameters.eval(newEnv, i, e.eval(callerEnv))
+            parameters.eval(newEnv, i, e.eval(env))
         }
         return func.body().eval(newEnv)
     }
