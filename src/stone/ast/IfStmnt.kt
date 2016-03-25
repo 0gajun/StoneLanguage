@@ -20,7 +20,7 @@ class IfStmnt(c: List<ASTree>) : ASTList(c){
         val c = condition().eval(env)
 
         return if (c == StoneConst.TRUE) {
-            condition().eval(env)
+            thenBlock().eval(env)
         } else {
             val block = elseBlock()
             if (block != null) block.eval(env) else 0
