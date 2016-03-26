@@ -3,6 +3,7 @@ package stone
 import stone.chapters.chap3.LexerRunner
 import stone.chapters.chap5.ParserRunner
 import stone.chapters.chap6.BasicInterpreter
+import stone.chapters.chap7.ClosureInterpreter
 import stone.chapters.chap7.FunctionInterpreter
 import stone.env.BasicEnv
 import stone.parser.BasicParser
@@ -12,5 +13,5 @@ import stone.parser.BasicParser
  */
 
 fun main(args: Array<String>) {
-    FunctionInterpreter.run()
+    ClosureInterpreter.run()
 }

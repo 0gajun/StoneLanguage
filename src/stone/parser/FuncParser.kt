@@ -11,7 +11,7 @@ import stone.parser.Parser.rule
  * Created by Junya on 2016/03/21.
  */
 
-class FuncParser : BasicParser() {
+open class FuncParser : BasicParser() {
     protected val param = rule().identifier(reserved)
 
     protected val params = rule(ParameterList::class.java).ast(param).repeat(rule().sep(",").ast(param))
