@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * サンプルのパーサ・コンビネータ
  */
-public class Parser {
+public class SampleParser {
     protected static abstract class Element {
         protected abstract void parse(Lexer lexer, List<ASTree> res)
                 throws ParseException;
@@ -25,25 +25,25 @@ public class Parser {
     }
 
     protected static class Tree extends Element {
-        protected Parser parser;
-        protected Tree(Parser p) { parser = p; }
+        protected SampleParser mSampleParser;
+        protected Tree(SampleParser p) { mSampleParser = p; }
         protected void parse(Lexer lexer, List<ASTree> res)
                 throws ParseException
         {
-            res.add(parser.parse(lexer));
+            res.add(mSampleParser.parse(lexer));
         }
         protected boolean match(Lexer lexer) throws ParseException {
-            return parser.match(lexer);
+            return mSampleParser.match(lexer);
         }
     }
 
     protected static class OrTree extends Element {
-        protected Parser[] parsers;
-        protected OrTree(Parser[] p) { parsers = p; }
+        protected SampleParser[] mSampleParsers;
+        protected OrTree(SampleParser[] p) { mSampleParsers = p; }
         protected void parse(Lexer lexer, List<ASTree> res)
                 throws ParseException
         {
-            Parser p = choose(lexer);
+            SampleParser p = choose(lexer);
             if (p == null)
                 throw new ParseException(lexer.peek(0));
             else
@@ -52,30 +52,30 @@ public class Parser {
         protected boolean match(Lexer lexer) throws ParseException {
             return choose(lexer) != null;
         }
-        protected Parser choose(Lexer lexer) throws ParseException {
-            for (Parser p: parsers)
+        protected SampleParser choose(Lexer lexer) throws ParseException {
+            for (SampleParser p: mSampleParsers)
                 if (p.match(lexer))
                     return p;
 
             return null;
         }
-        protected void insert(Parser p) {
-            Parser[] newParsers = new Parser[parsers.length + 1];
-            newParsers[0] = p;
-            System.arraycopy(parsers, 0, newParsers, 1, parsers.length);
-            parsers = newParsers;
+        protected void insert(SampleParser p) {
+            SampleParser[] newSampleParsers = new SampleParser[mSampleParsers.length + 1];
+            newSampleParsers[0] = p;
+            System.arraycopy(mSampleParsers, 0, newSampleParsers, 1, mSampleParsers.length);
+            mSampleParsers = newSampleParsers;
         }
     }
 
     protected static class Repeat extends Element {
-        protected Parser parser;
+        protected SampleParser mSampleParser;
         protected boolean onlyOnce;
-        protected Repeat(Parser p, boolean once) { parser = p; onlyOnce = once; }
+        protected Repeat(SampleParser p, boolean once) { mSampleParser = p; onlyOnce = once; }
         protected void parse(Lexer lexer, List<ASTree> res)
                 throws ParseException
         {
-            while (parser.match(lexer)) {
-                ASTree t = parser.parse(lexer);
+            while (mSampleParser.match(lexer)) {
+                ASTree t = mSampleParser.parse(lexer);
                 if (t.getClass() != ASTList.class || t.numChildren() > 0)
                     res.add(t);
                 if (onlyOnce)
@@ -83,7 +83,7 @@ public class Parser {
             }
         }
         protected boolean match(Lexer lexer) throws ParseException {
-            return parser.match(lexer);
+            return mSampleParser.match(lexer);
         }
     }
 
@@ -189,8 +189,8 @@ public class Parser {
     protected static class Expr extends Element {
         protected Factory factory;
         protected Operators ops;
-        protected Parser factor;
-        protected Expr(Class<? extends ASTree> clazz, Parser exp,
+        protected SampleParser factor;
+        protected Expr(Class<? extends ASTree> clazz, SampleParser exp,
                        Operators map)
         {
             factory = Factory.getForASTList(clazz);
@@ -295,10 +295,10 @@ public class Parser {
     protected List<Element> elements;
     protected Factory factory;
 
-    public Parser(Class<? extends ASTree> clazz) {
+    public SampleParser(Class<? extends ASTree> clazz) {
         reset(clazz);
     }
-    protected Parser(Parser p) {
+    protected SampleParser(SampleParser p) {
         elements = p.elements;
         factory = p.factory;
     }
@@ -317,87 +317,87 @@ public class Parser {
             return e.match(lexer);
         }
     }
-    public static Parser rule() { return rule(null); }
-    public static Parser rule(Class<? extends ASTree> clazz) {
-        return new Parser(clazz);
+    public static SampleParser rule() { return rule(null); }
+    public static SampleParser rule(Class<? extends ASTree> clazz) {
+        return new SampleParser(clazz);
     }
-    public Parser reset() {
+    public SampleParser reset() {
         elements = new ArrayList<Element>();
         return this;
     }
-    public Parser reset(Class<? extends ASTree> clazz) {
+    public SampleParser reset(Class<? extends ASTree> clazz) {
         elements = new ArrayList<Element>();
         factory = Factory.getForASTList(clazz);
         return this;
     }
-    public Parser number() {
+    public SampleParser number() {
         return number(null);
     }
-    public Parser number(Class<? extends ASTLeaf> clazz) {
+    public SampleParser number(Class<? extends ASTLeaf> clazz) {
         elements.add(new NumToken(clazz));
         return this;
     }
-    public Parser identifier(HashSet<String> reserved) {
+    public SampleParser identifier(HashSet<String> reserved) {
         return identifier(null, reserved);
     }
-    public Parser identifier(Class<? extends ASTLeaf> clazz,
-                             HashSet<String> reserved)
+    public SampleParser identifier(Class<? extends ASTLeaf> clazz,
+                                   HashSet<String> reserved)
     {
         elements.add(new IdToken(clazz, reserved));
         return this;
     }
-    public Parser string() {
+    public SampleParser string() {
         return string(null);
     }
-    public Parser string(Class<? extends ASTLeaf> clazz) {
+    public SampleParser string(Class<? extends ASTLeaf> clazz) {
         elements.add(new StrToken(clazz));
         return this;
     }
-    public Parser token(String... pat) {
+    public SampleParser token(String... pat) {
         elements.add(new Leaf(pat));
         return this;
     }
-    public Parser sep(String... pat) {
+    public SampleParser sep(String... pat) {
         elements.add(new Skip(pat));
         return this;
     }
-    public Parser ast(Parser p) {
+    public SampleParser ast(SampleParser p) {
         elements.add(new Tree(p));
         return this;
     }
-    public Parser or(Parser... p) {
+    public SampleParser or(SampleParser... p) {
         elements.add(new OrTree(p));
         return this;
     }
-    public Parser maybe(Parser p) {
-        Parser p2 = new Parser(p);
+    public SampleParser maybe(SampleParser p) {
+        SampleParser p2 = new SampleParser(p);
         p2.reset();
-        elements.add(new OrTree(new Parser[] { p, p2 }));
+        elements.add(new OrTree(new SampleParser[] { p, p2 }));
         return this;
     }
-    public Parser option(Parser p) {
+    public SampleParser option(SampleParser p) {
         elements.add(new Repeat(p, true));
         return this;
     }
-    public Parser repeat(Parser p) {
+    public SampleParser repeat(SampleParser p) {
         elements.add(new Repeat(p, false));
         return this;
     }
-    public Parser expression(Parser subexp, Operators operators) {
+    public SampleParser expression(SampleParser subexp, Operators operators) {
         elements.add(new Expr(null, subexp, operators));
         return this;
     }
-    public Parser expression(Class<? extends ASTree> clazz, Parser subexp,
-                             Operators operators) {
+    public SampleParser expression(Class<? extends ASTree> clazz, SampleParser subexp,
+                                   Operators operators) {
         elements.add(new Expr(clazz, subexp, operators));
         return this;
     }
-    public Parser insertChoice(Parser p) {
+    public SampleParser insertChoice(SampleParser p) {
         Element e = elements.get(0);
         if (e instanceof OrTree)
             ((OrTree)e).insert(p);
         else {
-            Parser otherwise = new Parser(this);
+            SampleParser otherwise = new SampleParser(this);
             reset(null);
             or(p, otherwise);
         }
