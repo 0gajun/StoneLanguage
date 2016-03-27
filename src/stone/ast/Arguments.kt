@@ -1,8 +1,9 @@
 package stone.ast
 
 import stone.env.Environment
-import stone.chapters.chap7.Function
+import stone.firstclass.Function
 import stone.exception.StoneException
+import stone.firstclass.NativeFunction
 
 /**
  * 引数を表す抽象構文木の節
@@ -13,10 +14,14 @@ class Arguments(t: List<ASTree>) : Postfix(t) {
     fun size() = numChildren()
 
     override fun eval(env: Environment, value: Any): Any {
-        if (value !is Function) {
-            throw StoneException("bad function", this)
+        return when (value) {
+            is Function -> evalNonNativeFunc(env, value)
+            is NativeFunction -> evalNativeFunc(env, value)
+            else -> throw StoneException("bad function, this")
         }
-        val func: Function = value
+    }
+
+    private fun evalNonNativeFunc(env: Environment, func: Function): Any {
         val parameters = func.parameters()
 
         if (size() != parameters.size()) {
@@ -28,6 +33,16 @@ class Arguments(t: List<ASTree>) : Postfix(t) {
             parameters.eval(newEnv, i, e.eval(env))
         }
         return func.body().eval(newEnv)
+    }
+
+    private fun evalNativeFunc(env: Environment, func: NativeFunction): Any {
+        if (size() != func.numOfParams()) {
+            throw StoneException("bad number of arguments", this)
+        }
+
+        val args = this.mapIndexed { j, c -> c.eval(env) }
+
+        return func.invoke(args, this)
     }
 }
 

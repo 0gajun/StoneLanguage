@@ -1,4 +1,4 @@
-package stone.chapters.chap7
+package stone.firstclass
 
 import stone.ast.BlockStmnt
 import stone.ast.ParameterList
@@ -7,6 +7,7 @@ import stone.env.NestedEnv
 
 /**
  * 関数オブジェクトクラス
+ * first-class object
  *
  * Created by Junya on 2016/03/24.
  */

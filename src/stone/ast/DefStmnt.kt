@@ -1,6 +1,6 @@
 package stone.ast
 
-import stone.chapters.chap7.Function
+import stone.firstclass.Function
 import stone.env.Environment
 
 /**
