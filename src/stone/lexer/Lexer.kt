@@ -152,7 +152,13 @@ class Lexer(r: Reader) {
 
     private fun toStringLiteral(s: String): String {
         var res = ""
-        val i = s.iterator()
+
+        if (s.length < 2) {
+            throw ParseException("bad string literal: " + s)
+        }
+
+        val i = s.substring(1, s.length - 1).iterator() // eliminate double quotes
+
         while (i.hasNext()) {
             var c = i.nextChar()
 
