@@ -27,12 +27,8 @@ class Parser {
             override fun match(lexer: Lexer): Boolean = parser.match(lexer)
         }
 
+        val factoryName = "create"
         abstract class Factory {
-            companion object {
-                fun getForASTList(clazz: KClass<out ASTree>?): Factory {
-
-                }
-            }
             @Throws(Exception::class)
             abstract fun make0(arg: Any): ASTree
             fun make(arg: Any): ASTree {
@@ -42,6 +38,33 @@ class Parser {
                     throw e1
                 } catch(e2: Exception) {
                     throw RuntimeException(e2) // this compiler is broken
+                }
+            }
+
+            companion object {
+                fun getForASTList(clazz: KClass<out ASTree>?): Factory {
+                    val f = get(clazz, List::class)
+                    if (f == null) {
+                        f =
+                    }
+
+                    return f!!
+                }
+
+                fun get(clazz: KClass<out ASTree>?, argType: KClass<*>): Factory? {
+                    if (clazz == null) {
+                        return null
+                    }
+                    try {
+                        val m = clazz.java.getMethod(factoryName, *listOf(argType.java).toTypedArray())
+                        return
+                    } catch(e: NoSuchMethodException) {}
+                    try {
+                        val c = clazz.java.getConstructor(argType.java)
+                        return
+                    } catch(e: NoSuchMethodException) {
+                        throw RuntimeException(e)
+                    }
                 }
             }
         }
