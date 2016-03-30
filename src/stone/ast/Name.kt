@@ -12,7 +12,7 @@ import stone.token.Token
 class Name(t: Token) : ASTLeaf(t) {
     fun name(): String = token.getText()
 
-    override fun eval(env: Environment): Any? {
+    override fun eval(env: Environment): Any {
         val v = env.get(name())
         if (v != null) {
             return v

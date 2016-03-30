@@ -9,5 +9,5 @@ import stone.token.Token
 class StringLiteral(t: Token) : ASTLeaf(t) {
     fun value() = token.getText()
 
-    override fun eval(env: Environment): Any? = value()
+    override fun eval(env: Environment): Any = value()
 }

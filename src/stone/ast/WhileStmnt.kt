@@ -14,7 +14,7 @@ class WhileStmnt(c: List<ASTree>) : ASTList(c) {
 
     override fun toString(): String = "(while " + condition() + " " + body() + ")"
 
-    override fun eval(env: Environment): Any? {
+    override fun eval(env: Environment): Any {
         var result : Any = 0
         while(condition().eval(env) == StoneConst.TRUE) {
             result = body().eval(env)

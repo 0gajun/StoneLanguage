@@ -18,7 +18,7 @@ open class ASTList(children: List<ASTree>) : ASTree {
 
     override fun children(): Iterator<ASTree> = children.iterator()
 
-    override fun eval(env: Environment): Any? {
+    override fun eval(env: Environment): Any {
         throw StoneException("cannot eval: " + toString(), this)
     }
 

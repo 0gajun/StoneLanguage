@@ -3,6 +3,7 @@ package stone.ast
 import stone.StoneConst
 import stone.env.Environment
 import stone.exception.StoneException
+import stone.firstclass.StoneObject
 
 /**
  * 二項演算子を表す節
@@ -15,7 +16,7 @@ class BinaryExpr(children: List<ASTree>) : ASTList(children) {
     fun operator(): String = (child(1) as ASTLeaf).token.getText()
     fun right(): ASTree = child(2)
 
-    override fun eval(env: Environment): Any? {
+    override fun eval(env: Environment): Any {
         val op = operator()
 
         if ("=".equals(op)) {
@@ -29,11 +30,27 @@ class BinaryExpr(children: List<ASTree>) : ASTList(children) {
 
     private fun computeAssign(env: Environment, rvalue: Any): Any {
         val l = left()
-        if (l is Name) {
+
+        if (l is PrimaryExpr && l.hasPostfix(0) && l.postfix(0) is Dot) {
+            // left side is some class object's member
+            val t = l.evalSubExpr(env, 1)
+            if (t is StoneObject) {
+                return setField(t, l.postfix(0) as Dot, rvalue)
+            }
+        } else if (l is Name) {
             env.put(l.name(), rvalue)
             return rvalue
-        } else {
-            throw StoneException("bad assignment", this)
+        }
+
+        throw StoneException("bad assignment", this)
+    }
+
+    private fun setField(obj: StoneObject, expr: Dot, rvalue: Any): Any {
+        try {
+            obj.write(expr.name(), rvalue)
+            return rvalue
+        } catch (e: StoneObject.AccessException) {
+            throw StoneException("bad member access: " + location() + ": " + expr.name())
         }
     }
 

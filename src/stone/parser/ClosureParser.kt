@@ -8,7 +8,7 @@ import stone.parser.Parser.Companion.rule
  *
  * Created by Junya on 2016/03/26.
  */
-class ClosureParser : FuncParser() {
+open class ClosureParser : FuncParser() {
     private val closure = rule(Fun::class).sep("fun").ast(paramList).ast(block)
     init {
         primary.insertChoice(closure)
