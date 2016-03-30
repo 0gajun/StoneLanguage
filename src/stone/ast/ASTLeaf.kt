@@ -20,7 +20,7 @@ open class ASTLeaf(token: Token) : ASTree {
 
     override fun numChildren(): Int = 0
 
-    override fun eval(env: Environment): Any {
+    override fun eval(env: Environment): Any? {
         throw StoneException("cannot eval: " + toString(), this)
     }
 

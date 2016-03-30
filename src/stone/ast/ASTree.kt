@@ -10,7 +10,7 @@ interface ASTree : Iterable<ASTree> {
     fun numChildren() :Int
     fun children() : Iterator<ASTree>
     fun location() : String?
-    fun eval(env: Environment) : Any
+    fun eval(env: Environment): Any?
     override fun toString(): String
 
     override fun iterator(): Iterator<ASTree> = children()

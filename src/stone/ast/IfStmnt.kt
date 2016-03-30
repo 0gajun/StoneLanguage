@@ -16,7 +16,7 @@ class IfStmnt(c: List<ASTree>) : ASTList(c){
     override fun toString(): String
             = "(if " + condition() + " " + thenBlock() + " else " + elseBlock() + ")"
 
-    override fun eval(env: Environment): Any {
+    override fun eval(env: Environment): Any? {
         val c = condition().eval(env)
 
         return if (c == StoneConst.TRUE) {

@@ -13,5 +13,5 @@ class Fun(c: List<ASTree>): ASTList(c){
     fun body() = child(1) as BlockStmnt
     override fun toString(): String = "(fun " + parameters() + " " + body() + ")"
 
-    override fun eval(env: Environment): Any = Function(parameters(), body(), env)
+    override fun eval(env: Environment): Any? = Function(parameters(), body(), env)
 }

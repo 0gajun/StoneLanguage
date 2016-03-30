@@ -15,7 +15,7 @@ class BinaryExpr(children: List<ASTree>) : ASTList(children) {
     fun operator(): String = (child(1) as ASTLeaf).token.getText()
     fun right(): ASTree = child(2)
 
-    override fun eval(env: Environment): Any {
+    override fun eval(env: Environment): Any? {
         val op = operator()
 
         if ("=".equals(op)) {
