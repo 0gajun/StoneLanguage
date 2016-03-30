@@ -3,7 +3,7 @@ package stone.parser
 import stone.ast.Arguments
 import stone.ast.DefStmnt
 import stone.ast.ParameterList
-import stone.parser.Parser.rule
+import stone.parser.Parser.Companion.rule
 
 /**
  * プロシージャを追加したパーサ
@@ -14,13 +14,13 @@ import stone.parser.Parser.rule
 open class FuncParser : BasicParser() {
     protected val param = rule().identifier(reserved)
 
-    protected val params = rule(ParameterList::class.java).ast(param).repeat(rule().sep(",").ast(param))
+    protected val params = rule(ParameterList::class).ast(param).repeat(rule().sep(",").ast(param))
 
     protected val paramList = rule().sep("(").maybe(params).sep(")")
 
-    protected val def = rule(DefStmnt::class.java).sep("def").identifier(reserved).ast(paramList).ast(block)
+    protected val def = rule(DefStmnt::class).sep("def").identifier(reserved).ast(paramList).ast(block)
 
-    protected val args = rule(Arguments::class.java).ast(expr).repeat(rule().sep(",").ast(expr))
+    protected val args = rule(Arguments::class).ast(expr).repeat(rule().sep(",").ast(expr))
 
     protected val postfix = rule().sep("(").maybe(args).sep(")")
 
