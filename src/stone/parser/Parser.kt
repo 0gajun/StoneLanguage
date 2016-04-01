@@ -255,91 +255,60 @@ class Parser {
 
     @Throws(ParseException::class)
     fun parse(lexer: Lexer): ASTree {
-        val results: MutableList<ASTree> = mutableListOf()
-        elements.forEach { it.parse(lexer, results) }
+        val results = mutableListOf<ASTree>().apply {
+            elements.forEach { it.parse(lexer, this) }
+        }
 
         return factory.make(results)
     }
 
     fun match(lexer: Lexer): Boolean = if (elements.isEmpty()) true else elements.first().match(lexer)
 
-    fun reset(): Parser {
-        elements = mutableListOf()
-        return this
-    }
+    fun reset(): Parser = apply { elements = mutableListOf() }
 
-    fun reset(clazz: KClass<out ASTree>?): Parser {
+    fun reset(clazz: KClass<out ASTree>?): Parser = apply {
         elements = mutableListOf()
         factory = Factory.getForASTList(clazz)
-        return this
     }
 
     fun number(): Parser = number(null)
 
-    fun number(clazz: KClass<out ASTLeaf>?): Parser {
-        elements.add(NumToken(clazz))
-        return this
-    }
+    fun number(clazz: KClass<out ASTLeaf>?): Parser = apply { elements.add(NumToken(clazz)) }
 
     fun identifier(reserved: HashSet<String>): Parser = identifier(null, reserved)
 
-    fun identifier(clazz: KClass<out ASTLeaf>?, reserved: HashSet<String>): Parser {
-        elements.add(IdToken(clazz, reserved))
-        return this
-    }
+    fun identifier(clazz: KClass<out ASTLeaf>?, reserved: HashSet<String>): Parser
+            = apply { elements.add(IdToken(clazz, reserved)) }
 
     fun string(): Parser = string(null)
 
-    fun string(clazz: KClass<out ASTLeaf>?): Parser {
-        elements.add(StrToken(clazz))
-        return this
+    fun string(clazz: KClass<out ASTLeaf>?): Parser = apply { elements.add(StrToken(clazz)) }
+
+    fun token(vararg pat: String): Parser = apply { elements.add(Leaf(pat.asList())) }
+
+    fun sep(vararg pat: String): Parser = apply { elements.add(Skip(pat.asList())) }
+
+    fun ast(p: Parser): Parser = apply { elements.add(Tree(p)) }
+
+    fun or(vararg p: Parser): Parser = apply { elements.add(OrTree(p.asList())) }
+
+    fun maybe(p: Parser): Parser = apply {
+        Parser(p).let {
+            it.reset()
+            elements.add(OrTree(listOf(p, it)))
+        }
     }
 
-    fun token(vararg pat: String): Parser {
-        elements.add(Leaf(pat.asList()))
-        return this
-    }
+    fun option(p: Parser): Parser = apply { elements.add(Repeat(p, true)) }
 
-    fun sep(vararg pat: String): Parser {
-        elements.add(Skip(pat.asList()))
-        return this
-    }
-
-    fun ast(p: Parser): Parser {
-        elements.add(Tree(p))
-        return this
-    }
-
-    fun or(vararg p: Parser): Parser {
-        elements.add(OrTree(p.asList()))
-        return this
-    }
-
-    fun maybe(p: Parser): Parser {
-        val p2 = Parser(p)
-        p2.reset()
-        elements.add(OrTree(listOf(p, p2)))
-        return this
-    }
-
-    fun option(p: Parser): Parser {
-        elements.add(Repeat(p, true))
-        return this
-    }
-
-    fun repeat(p: Parser): Parser {
-        elements.add(Repeat(p, false))
-        return this
-    }
+    fun repeat(p: Parser): Parser = apply { elements.add(Repeat(p, false)) }
 
     fun expression(subexp: Parser, operators: Operators): Parser = expression(null, subexp, operators)
 
-    fun expression(clazz: KClass<out ASTree>?, subexp: Parser, operators: Operators): Parser {
-        elements.add(Expr(clazz, subexp, operators))
-        return this
-    }
+    fun expression(clazz: KClass<out ASTree>?, subexp: Parser, operators: Operators): Parser
+            = apply { elements.add(Expr(clazz, subexp, operators)) }
 
-    fun insertChoice(p: Parser): Parser {
+    fun insertChoice(p: Parser): Parser = apply {
         val e = elements[0]
         if (e is OrTree) {
             e.insert(p)
@@ -348,6 +317,5 @@ class Parser {
             reset(null)
             or(p, otherwise)
         }
-        return this
     }
 }
