@@ -24,8 +24,7 @@ class Parser {
             abstract fun match(lexer: Lexer): Boolean
         }
 
-        class Tree(p: Parser) : Element() {
-            private val parser: Parser = p
+        class Tree(val parser: Parser) : Element() {
             override fun parse(lexer: Lexer, res: MutableList<ASTree>) {
                 res.add(parser.parse(lexer))
             }
@@ -34,7 +33,7 @@ class Parser {
         }
 
         class OrTree(p: List<Parser>) : Element() {
-            private var parsers = p.toMutableList()
+            private val parsers = p.toMutableList()
             override fun parse(lexer: Lexer, res: MutableList<ASTree>) {
                 val p = choose(lexer)
                 if (p == null) {
@@ -44,9 +43,7 @@ class Parser {
                 }
             }
 
-            override fun match(lexer: Lexer): Boolean {
-                return choose(lexer) != null
-            }
+            override fun match(lexer: Lexer): Boolean = choose(lexer) != null
 
             fun choose(lexer: Lexer): Parser? = parsers.firstOrNull { it.match(lexer) }
 
@@ -55,13 +52,11 @@ class Parser {
             }
         }
 
-        class Repeat(p: Parser, once: Boolean) : Element() {
-            private val parser = p
-            private val onlyOnce = once
+        class Repeat(val parser: Parser, val onlyOnce: Boolean) : Element() {
             override fun parse(lexer: Lexer, res: MutableList<ASTree>) {
                 while (parser.match(lexer)) {
                     val t = parser.parse(lexer)
-                    if (t.javaClass != ASTList::class.java || t.numChildren() > 0) {
+                    if (t !is ASTList || t.numChildren() > 0) {
                         res.add(t)
                     }
                     if (onlyOnce) {
@@ -96,8 +91,7 @@ class Parser {
             abstract fun test(t: Token): Boolean
         }
 
-        class IdToken(type: KClass<out ASTLeaf>?, reserved: HashSet<String>) : AToken(type) {
-            val reserved = reserved
+        class IdToken(type: KClass<out ASTLeaf>?, val reserved: HashSet<String>) : AToken(type) {
             override fun test(t: Token): Boolean = t.isIdentifier() && !reserved.contains(t.getText())
         }
 
@@ -109,8 +103,7 @@ class Parser {
             override fun test(t: Token): Boolean = t.isString()
         }
 
-        open class Leaf(pat: List<String>) : Element() {
-            val tokens = pat
+        open class Leaf(val tokens: List<String>) : Element() {
             override fun parse(lexer: Lexer, res: MutableList<ASTree>) {
                 val t = lexer.read()
                 if (t.isIdentifier() && tokens.contains(t.getText())) {
@@ -118,20 +111,12 @@ class Parser {
                     return
                 }
 
-                if (tokens.isEmpty()) {
-                    throw ParseException(t)
-                } else {
-                    ParseException(tokens.first() + " expected.", t)
-                }
+                throw if (tokens.isEmpty()) ParseException(t) else ParseException(tokens.first() + " expected.", t)
             }
 
             override fun match(lexer: Lexer): Boolean {
                 val t = lexer.peek(0)
-                if (t.isIdentifier()) {
-                    return tokens.firstOrNull { it.equals(t.getText()) } != null
-                } else {
-                    return false
-                }
+                return if (t.isIdentifier()) (tokens.firstOrNull { it.equals(t.getText()) } != null) else false
             }
 
             open fun find(res: MutableList<ASTree>, t: Token) {
@@ -157,10 +142,8 @@ class Parser {
             }
         }
 
-        class Expr(clazz: KClass<out ASTree>?, exp: Parser, map: Operators) : Element() {
+        class Expr(clazz: KClass<out ASTree>?, val factor: Parser, val ops: Operators) : Element() {
             private val factory = Factory.getForASTList(clazz)
-            private val ops = map
-            private val factor = exp
             override fun parse(lexer: Lexer, res: MutableList<ASTree>) {
                 var right = factor.parse(lexer)
                 var prec: Precedence? = nextOperator(lexer)
@@ -178,8 +161,9 @@ class Parser {
                 var right = factor.parse(lexer)
 
                 var next: Precedence? = nextOperator(lexer)
-                while (next != null && rightIsExpr(prec, next))
+                while (next != null && rightIsExpr(prec, next)) {
                     right = doShift(lexer, right, next.value)
+                }
 
                 list.add(right)
                 return factory.make(list)
@@ -215,15 +199,14 @@ class Parser {
             companion object {
                 fun getForASTList(clazz: KClass<out ASTree>?): Factory {
                     var f = get(clazz, List::class)
-                    if (f == null) {
-                        f = object : Factory() {
+                    return if (f != null) f else {
+                        object : Factory() {
                             override fun make0(arg: Any): ASTree {
                                 val results: List<ASTree> = arg as List<ASTree>
                                 return if (results.size == 1) results.first() else ASTList(results)
                             }
                         }
                     }
-                    return f
                 }
 
                 fun get(clazz: KClass<out ASTree>?, argType: KClass<*>): Factory? {
@@ -278,13 +261,7 @@ class Parser {
         return factory.make(results)
     }
 
-    fun match(lexer: Lexer): Boolean {
-        if (elements.isEmpty()) {
-            return true
-        } else {
-            return elements.first().match(lexer)
-        }
-    }
+    fun match(lexer: Lexer): Boolean = if (elements.isEmpty()) true else elements.first().match(lexer)
 
     fun reset(): Parser {
         elements = mutableListOf()
@@ -355,9 +332,7 @@ class Parser {
         return this
     }
 
-    fun expression(subexp: Parser, operators: Operators): Parser {
-        return expression(null, subexp, operators)
-    }
+    fun expression(subexp: Parser, operators: Operators): Parser = expression(null, subexp, operators)
 
     fun expression(clazz: KClass<out ASTree>?, subexp: Parser, operators: Operators): Parser {
         elements.add(Expr(clazz, subexp, operators))
