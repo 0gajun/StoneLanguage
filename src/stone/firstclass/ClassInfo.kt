@@ -14,13 +14,12 @@ class ClassInfo(private val definition: ClassStmnt, private val environment: Env
     protected val superClass: ClassInfo?
 
     init {
-        val obj = if (definition.superClass().isNullOrBlank()) {
-            null
-        } else {
-            environment.get(definition.superClass()!!)
-        }
-        superClass = if (obj == null) null else if (obj is ClassInfo) obj else {
-            throw StoneException("unknown super class: " + definition.superClass(), definition)
+        val obj = definition.superClass()?.let { environment.get(it) }
+
+        superClass = when (obj) {
+            null -> null
+            is ClassInfo -> obj
+            else -> throw StoneException("unknown super class: " + definition.superClass(), definition)
         }
     }
 

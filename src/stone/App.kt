@@ -6,6 +6,7 @@ import stone.chapters.chap6.BasicInterpreter
 import stone.chapters.chap7.ClosureInterpreter
 import stone.chapters.chap7.FunctionInterpreter
 import stone.chapters.chap8.NativeInterpreter
+import stone.chapters.chap9.ClassInterpreter
 import stone.env.BasicEnv
 import stone.parser.BasicParser
 
@@ -14,5 +15,5 @@ import stone.parser.BasicParser
  */
 
 fun main(args: Array<String>) {
-    NativeInterpreter.run()
+    ClassInterpreter.run()
 }
