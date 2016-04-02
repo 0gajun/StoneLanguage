@@ -31,6 +31,19 @@ class BinaryExpr(children: List<ASTree>) : ASTList(children) {
     private fun computeAssign(env: Environment, rvalue: Any): Any {
         val l = left()
 
+        if (l is PrimaryExpr && l.hasPostfix(0) && l.postfix(0) is ArrayRef) {
+            val o = l.evalSubExpr(env, 1)
+            if (o is MutableList<*>) {
+                val list = o as MutableList<Any>
+                val arrRef = l.postfix(0) as ArrayRef
+                val index = arrRef.index().eval(env)
+                if (index is Int) {
+                    list[index] = rvalue
+                    return rvalue
+                }
+            }
+            throw StoneException("bad array access")
+        }
         if (l is PrimaryExpr && l.hasPostfix(0) && l.postfix(0) is Dot) {
             // left side is some class object's member
             val t = l.evalSubExpr(env, 1)

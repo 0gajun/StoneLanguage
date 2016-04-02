@@ -9,6 +9,7 @@ import stone.chapters.chap8.NativeInterpreter
 import stone.chapters.chap9.ClassInterpreter
 import stone.env.BasicEnv
 import stone.parser.BasicParser
+import stone.parser.FuncParser
 
 /**
  * Created by Junya on 2016/03/18.
