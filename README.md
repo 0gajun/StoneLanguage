@@ -10,4 +10,4 @@ This is the book about creating programming language using Java.
 
 The Stone language is example language of it.
 
-So, this is not my own language.
+So, this is not my own programming language.
