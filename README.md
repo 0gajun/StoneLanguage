@@ -1,5 +1,5 @@
 # This repository's purpose
-Creating the Stone Language using Kotolin!!!
+Creating the Stone Language using Kotlin!!!
 (Originally written by java.)
 
 # What is the Stone Language?
